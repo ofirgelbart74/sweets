@@ -1,0 +1,14 @@
+Number,Question,What was the problem type?,What was the problem?,How would you fix it?,Answer,Commit,Comment
+1,"CREATE TABLE `marc_subfield_structure` (
+  `frameworkcode` varchar(4) NOT NULL default '',
+  `tagfield` varchar(3) NOT NULL default '',
+  `tagsubfield` char(1) NOT NULL default '',
+  ...
+  `hidden` tinyint(1) default NULL
+  -- 952$y/itemtype was set to hidden=1 by default
+);",Bug,"The MARC subfield 952$y (itemtype) was set to hidden by default in kohastructure.sql, causing it to not appear in the interface even though it should be visible.",Change the hidden value from 1 to 0 for the 952$y subfield so it is visible by default.,UPDATE marc_subfield_structure SET hidden=0 WHERE tagfield='952' AND tagsubfield='y';,64f933a2faa862c4981491f3ca51cf9082ef4254,bywatersolutions/bws-package
+2,"INSERT INTO `creature` (`guid`, `id`, `map`, ...) VALUES
+(1234, 5678, 0, ...),
+(1234, 5678, 0, ...);  -- duplicate entry",Bug,"A duplicate entry existed in the world database table. The same row was inserted twice, causing data integrity issues and potential runtime errors.",Remove the duplicate INSERT entry from the SQL file so each record appears only once.,"-- Remove the duplicate row:
+DELETE FROM creature WHERE guid = 1234 LIMIT 1;
+-- Or fix the SQL file to not insert the duplicate in the first place.",8a2b1c302b963db961b1f43c6e718eab0ae42537,TrinityCore/TrinityCore
