@@ -1,9 +1,10 @@
 Number,Question,What was the problem type?,What was the problem?,How would you fix it?,Answer,Commit,Comment
-1,"UPDATE creature_template SET ScriptName='npc_highlord_darion_mograine' WHERE entry=29173;
-UPDATE creature_template SET ScriptName='npc_squire_lilian_voss' WHERE entry=29204
-UPDATE creature_template SET ScriptName='npc_highlord_tirion_fordring' WHERE entry=29175;",Bug,"A semicolon is missing at the end of the second SQL statement. Without it, the SQL parser treats the second and third statements as one continuous expression, causing a syntax error and preventing all subsequent statements from executing.",Add the missing semicolon at the end of the second UPDATE statement.,"UPDATE creature_template SET ScriptName='npc_highlord_darion_mograine' WHERE entry=29173;
-UPDATE creature_template SET ScriptName='npc_squire_lilian_voss' WHERE entry=29204;
-UPDATE creature_template SET ScriptName='npc_highlord_tirion_fordring' WHERE entry=29175;",a230fdb1369ad61c3687d2faae03aec6c3f09ef2,TrinityCore/TrinityCore
+1,"ALTER TABLE marc_subfield_structure
+  MODIFY COLUMN authorised_value varchar(10) DEFAULT NULL,
+  MODIFY COLUMN authtypecode varchar(10) DEFAULT NULL;",Bug,"The columns authorised_value and authtypecode in marc_subfield_structure were defined with varchar(10), which was too short and caused data truncation. The correct size should be varchar(20).","Change the column size from varchar(10) to varchar(20) for both columns.","After commit:
+ALTER TABLE marc_subfield_structure
+  MODIFY COLUMN authorised_value varchar(20) DEFAULT NULL,
+  MODIFY COLUMN authtypecode varchar(20) DEFAULT NULL;",f1752b544f7f465c826665343627227941755c2b,bywatersolutions/bws-package
 2,"CREATE TABLE execution_logs (
   enc_type     varchar(128) NOT NULL,
   exec_id      bigint       NOT NULL,
@@ -13,7 +14,8 @@ UPDATE creature_template SET ScriptName='npc_highlord_tirion_fordring' WHERE ent
   end_byte     bigint       DEFAULT 0,
   length       bigint       DEFAULT 0,
   upload_time  bigint       DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;",Data integrity,"The execution_logs table is created without a PRIMARY KEY. This allows duplicate rows to be inserted with identical values for enc_type, exec_id, attempt_id, and name, making individual log entries indistinguishable and potentially corrupting log data.",Add a composite PRIMARY KEY on the columns that uniquely identify each log entry.,"CREATE TABLE execution_logs (
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",Data integrity,"The execution_logs table is created without a PRIMARY KEY. This allows duplicate rows to be inserted with identical values for enc_type, exec_id, attempt_id, and name, making individual log entries indistinguishable and potentially corrupting log data.",Add a composite PRIMARY KEY on the columns that uniquely identify each log entry.,"After commit:
+CREATE TABLE execution_logs (
   enc_type     varchar(128) NOT NULL,
   exec_id      bigint       NOT NULL,
   attempt_id   int          NOT NULL,
@@ -24,3 +26,4 @@ UPDATE creature_template SET ScriptName='npc_highlord_tirion_fordring' WHERE ent
   upload_time  bigint       DEFAULT 0,
   PRIMARY KEY (enc_type, exec_id, attempt_id, name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;",6ed18c149b491e7c33a06d8124318be553b8cebe,azkaban/azkaban
+```
