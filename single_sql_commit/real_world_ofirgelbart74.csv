@@ -1,14 +1,26 @@
 Number,Question,What was the problem type?,What was the problem?,How would you fix it?,Answer,Commit,Comment
-1,"CREATE TABLE `marc_subfield_structure` (
-  `frameworkcode` varchar(4) NOT NULL default '',
-  `tagfield` varchar(3) NOT NULL default '',
-  `tagsubfield` char(1) NOT NULL default '',
-  ...
-  `hidden` tinyint(1) default NULL
-  -- 952$y/itemtype was set to hidden=1 by default
-);",Bug,"The MARC subfield 952$y (itemtype) was set to hidden by default in kohastructure.sql, causing it to not appear in the interface even though it should be visible.",Change the hidden value from 1 to 0 for the 952$y subfield so it is visible by default.,UPDATE marc_subfield_structure SET hidden=0 WHERE tagfield='952' AND tagsubfield='y';,64f933a2faa862c4981491f3ca51cf9082ef4254,bywatersolutions/bws-package
-2,"INSERT INTO `creature` (`guid`, `id`, `map`, ...) VALUES
-(1234, 5678, 0, ...),
-(1234, 5678, 0, ...);  -- duplicate entry",Bug,"A duplicate entry existed in the world database table. The same row was inserted twice, causing data integrity issues and potential runtime errors.",Remove the duplicate INSERT entry from the SQL file so each record appears only once.,"-- Remove the duplicate row:
-DELETE FROM creature WHERE guid = 1234 LIMIT 1;
--- Or fix the SQL file to not insert the duplicate in the first place.",8a2b1c302b963db961b1f43c6e718eab0ae42537,TrinityCore/TrinityCore
+1,"UPDATE creature_template SET ScriptName='npc_highlord_darion_mograine' WHERE entry=29173;
+UPDATE creature_template SET ScriptName='npc_squire_lilian_voss' WHERE entry=29204
+UPDATE creature_template SET ScriptName='npc_highlord_tirion_fordring' WHERE entry=29175;",Bug,"A semicolon is missing at the end of the second SQL statement. Without it, the SQL parser treats the second and third statements as one continuous expression, causing a syntax error and preventing all subsequent statements from executing.",Add the missing semicolon at the end of the second UPDATE statement.,"UPDATE creature_template SET ScriptName='npc_highlord_darion_mograine' WHERE entry=29173;
+UPDATE creature_template SET ScriptName='npc_squire_lilian_voss' WHERE entry=29204;
+UPDATE creature_template SET ScriptName='npc_highlord_tirion_fordring' WHERE entry=29175;",a230fdb1369ad61c3687d2faae03aec6c3f09ef2,TrinityCore/TrinityCore
+2,"CREATE TABLE execution_logs (
+  enc_type     varchar(128) NOT NULL,
+  exec_id      bigint       NOT NULL,
+  attempt_id   int          NOT NULL,
+  name         varchar(640) NOT NULL,
+  start_byte   bigint       DEFAULT 0,
+  end_byte     bigint       DEFAULT 0,
+  length       bigint       DEFAULT 0,
+  upload_time  bigint       DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",Data integrity,"The execution_logs table is created without a PRIMARY KEY. This allows duplicate rows to be inserted with identical values for enc_type, exec_id, attempt_id, and name, making individual log entries indistinguishable and potentially corrupting log data.",Add a composite PRIMARY KEY on the columns that uniquely identify each log entry.,"CREATE TABLE execution_logs (
+  enc_type     varchar(128) NOT NULL,
+  exec_id      bigint       NOT NULL,
+  attempt_id   int          NOT NULL,
+  name         varchar(640) NOT NULL,
+  start_byte   bigint       DEFAULT 0,
+  end_byte     bigint       DEFAULT 0,
+  length       bigint       DEFAULT 0,
+  upload_time  bigint       DEFAULT 0,
+  PRIMARY KEY (enc_type, exec_id, attempt_id, name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",6ed18c149b491e7c33a06d8124318be553b8cebe,azkaban/azkaban
