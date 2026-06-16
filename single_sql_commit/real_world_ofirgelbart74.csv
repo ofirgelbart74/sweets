@@ -1,29 +1,3 @@
 Number,Question,What was the problem type?,What was the problem?,How would you fix it?,Answer,Commit,Comment
-1,"ALTER TABLE marc_subfield_structure
-  MODIFY COLUMN authorised_value varchar(10) DEFAULT NULL,
-  MODIFY COLUMN authtypecode varchar(10) DEFAULT NULL;",Bug,"The columns authorised_value and authtypecode in marc_subfield_structure were defined with varchar(10), which was too short and caused data truncation. The correct size should be varchar(20).","Change the column size from varchar(10) to varchar(20) for both columns.","After commit:
-ALTER TABLE marc_subfield_structure
-  MODIFY COLUMN authorised_value varchar(20) DEFAULT NULL,
-  MODIFY COLUMN authtypecode varchar(20) DEFAULT NULL;",f1752b544f7f465c826665343627227941755c2b,bywatersolutions/bws-package
-2,"CREATE TABLE execution_logs (
-  enc_type     varchar(128) NOT NULL,
-  exec_id      bigint       NOT NULL,
-  attempt_id   int          NOT NULL,
-  name         varchar(640) NOT NULL,
-  start_byte   bigint       DEFAULT 0,
-  end_byte     bigint       DEFAULT 0,
-  length       bigint       DEFAULT 0,
-  upload_time  bigint       DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;",Data integrity,"The execution_logs table is created without a PRIMARY KEY. This allows duplicate rows to be inserted with identical values for enc_type, exec_id, attempt_id, and name, making individual log entries indistinguishable and potentially corrupting log data.",Add a composite PRIMARY KEY on the columns that uniquely identify each log entry.,"After commit:
-CREATE TABLE execution_logs (
-  enc_type     varchar(128) NOT NULL,
-  exec_id      bigint       NOT NULL,
-  attempt_id   int          NOT NULL,
-  name         varchar(640) NOT NULL,
-  start_byte   bigint       DEFAULT 0,
-  end_byte     bigint       DEFAULT 0,
-  length       bigint       DEFAULT 0,
-  upload_time  bigint       DEFAULT 0,
-  PRIMARY KEY (enc_type, exec_id, attempt_id, name)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;",6ed18c149b491e7c33a06d8124318be553b8cebe,azkaban/azkaban
-```
+1,"ALTER TABLE marc_subfield_structure MODIFY COLUMN authorised_value varchar(10) DEFAULT NULL, MODIFY COLUMN authtypecode varchar(10) DEFAULT NULL;","Bug","The columns authorised_value and authtypecode were defined as varchar(10), which was too short and could truncate valid values.","Increase both columns to varchar(20).","ALTER TABLE marc_subfield_structure MODIFY COLUMN authorised_value varchar(20) DEFAULT NULL, MODIFY COLUMN authtypecode varchar(20) DEFAULT NULL;","f1752b544f7f465c826665343627227941755c2b","bywatersolutions/bws-package"
+2,"CREATE TABLE execution_logs (enc_type varchar(128) NOT NULL, exec_id bigint NOT NULL, attempt_id int NOT NULL, name varchar(640) NOT NULL, start_byte bigint DEFAULT 0, end_byte bigint DEFAULT 0, length bigint DEFAULT 0, upload_time bigint DEFAULT 0) ENGINE=InnoDB DEFAULT CHARSET=utf8;","Data integrity","The execution_logs table was created without a primary key, allowing duplicate rows with the same logical identity.","Add a composite PRIMARY KEY on enc_type, exec_id, attempt_id, and name.","CREATE TABLE execution_logs (enc_type varchar(128) NOT NULL, exec_id bigint NOT NULL, attempt_id int NOT NULL, name varchar(640) NOT NULL, start_byte bigint DEFAULT 0, end_byte bigint DEFAULT 0, length bigint DEFAULT 0, upload_time bigint DEFAULT 0, PRIMARY KEY (enc_type, exec_id, attempt_id, name)) ENGINE=InnoDB DEFAULT CHARSET=utf8;","6ed18c149b491e7c33a06d8124318be553b8cebe","azkaban/azkaban"
